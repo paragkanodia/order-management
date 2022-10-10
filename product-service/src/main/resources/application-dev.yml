@@ -1,0 +1,10 @@
+#Possible values for environmentName: local, dev, staging, preprod, production
+environmentName: dev
+
+server:
+  port: 8871
+  servlet:
+    contextPath: /orderManagement
+  host: localhost
+
+

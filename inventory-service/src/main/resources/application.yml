@@ -1,0 +1,7 @@
+app:
+  version: 1.0
+  name: order-management
+
+spring:
+  profiles:
+    active: dev
