@@ -7,4 +7,22 @@ server:
     contextPath: /orderManagement
   host: localhost
 
+#configs for resilience4j
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      failureRateThreshold: 60
+      slowCallRateThreshold: 100
+      slowCallDurationThreshold: 60000
+      permittedNumberOfCallsInHalfOpenState: 5
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 100
+      minimumNumberOfCalls: 6
+      waitDurationInOpenState: 120000
+      registerHealthIndicator: true
+      eventConsumerBufferSize: 10
+  instances:
+    PRODUCT_SERVICE:
+      baseConfig: default
+
 

@@ -6,10 +6,12 @@ import com.intuit.commons.restClients.productService.request.UpdateProductReques
 import com.intuit.commons.restClients.productService.response.PriceQuoteResponseDTO;
 import com.intuit.commons.restClients.productService.response.ProductResponseDTO;
 import com.intuit.commons.restClients.productService.service.api.ProductApi;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import retrofit2.Retrofit;
 
 import java.util.concurrent.CompletionStage;
 
+@CircuitBreaker(name = "PRODUCT_SERVICE")
 public class ProductServiceImpl implements ProductService{
 
     private ProductApi productApi;

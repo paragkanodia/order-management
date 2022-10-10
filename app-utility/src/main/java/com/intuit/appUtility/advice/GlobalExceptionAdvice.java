@@ -2,6 +2,7 @@ package com.intuit.appUtility.advice;
 
 import com.intuit.commons.dto.ErrorResponseDTO;
 import com.intuit.commons.exception.*;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.postgresql.util.PSQLException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -74,6 +76,12 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException exception, WebRequest request) {
         return getErrorResponseResponseEntity(HttpStatus.BAD_REQUEST, (Exception) exception.getCause().getCause(), null, ExceptionCodes.V101, null);
+    }
+
+    @ExceptionHandler({CallNotPermittedException.class})
+    public ResponseEntity<ErrorResponseDTO> handleCallNotPermittedException(CallNotPermittedException callNotPermittedException) {
+        return getErrorResponseResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, callNotPermittedException, null, ExceptionCodes.R101,
+                Collections.singletonMap("CIRCUIT_BREAKER_NAME", callNotPermittedException.getCausingCircuitBreakerName()));
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
