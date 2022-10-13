@@ -32,4 +32,10 @@ public interface OrderController {
      CompletionStage<OrderResponseDTO> cancelOrder(
             @PathVariable("orderNo") String orderNo);
 
+    @PatchMapping("/{orderNo}/retry")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Retry placing the order", description = "This API is to retry placing the order")
+    CompletionStage<Boolean> retryOrder(
+            @PathVariable("orderNo") String orderNo);
+
 }

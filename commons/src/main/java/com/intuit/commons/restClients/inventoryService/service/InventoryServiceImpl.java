@@ -1,7 +1,8 @@
 package com.intuit.commons.restClients.inventoryService.service;
 
 import com.intuit.commons.rest.RestClientUtil;
-import com.intuit.commons.restClients.inventoryService.request.InventoryRequestDTO;
+import com.intuit.commons.restClients.inventoryService.request.DeductInventoryRequestDTO;
+import com.intuit.commons.restClients.inventoryService.request.RevertInventoryDeductionRequestDTO;
 import com.intuit.commons.restClients.inventoryService.service.api.InventoryApi;
 import retrofit2.Retrofit;
 
@@ -18,13 +19,12 @@ public class InventoryServiceImpl implements InventoryService{
         this.restClientUtil=restClientUtil;
     }
 
-    @Override
-    public CompletionStage<Boolean> addInventory(InventoryRequestDTO inventoryRequestDTO) {
-        return restClientUtil.toCompletableFuture(inventoryApi.addInventory(inventoryRequestDTO));
+    public CompletionStage<Boolean> revertInventoryDeduction(RevertInventoryDeductionRequestDTO inventoryRequestDTO) {
+        return restClientUtil.toCompletableFuture(inventoryApi.revertInventoryDeduction(inventoryRequestDTO));
     }
 
     @Override
-    public CompletionStage<Boolean> deductInventory(InventoryRequestDTO inventoryRequestDTO) {
+    public CompletionStage<Boolean> deductInventory(DeductInventoryRequestDTO inventoryRequestDTO) {
         return restClientUtil.toCompletableFuture(inventoryApi.deductInventory(inventoryRequestDTO));
     }
 }

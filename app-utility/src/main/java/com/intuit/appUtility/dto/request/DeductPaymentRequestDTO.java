@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentRequestDTO {
+public class DeductPaymentRequestDTO {
 
     private Long orderId;
     private String userId;

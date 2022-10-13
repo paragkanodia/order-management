@@ -122,7 +122,7 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
                 .exceptionCode(exceptionCode.getCode())
                 .details(details)
                 .source(source)
-                .application("sapphire")
+                .application("orderManagementApp")
                 .build();
         errorResponseDTO.setStatusCode(errorCode.value());
         errorResponseDTO.setStatusMessage("Error Occurred");

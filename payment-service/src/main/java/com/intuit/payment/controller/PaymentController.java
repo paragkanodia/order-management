@@ -1,6 +1,8 @@
 package com.intuit.payment.controller;
 
-import com.intuit.appUtility.dto.request.PaymentRequestDTO;
+import com.intuit.appUtility.dto.request.AddBalanceRequestDTO;
+import com.intuit.appUtility.dto.request.DeductPaymentRequestDTO;
+import com.intuit.appUtility.dto.request.RevertPaymentRequestDTO;
 import com.intuit.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +19,20 @@ public class PaymentController {
 
     @PostMapping("/deduct")
     @Operation(summary = "deducts user balance against an order", description = "This api deducts user balance against an order")
-    public CompletionStage<Boolean> deduct(@RequestBody final PaymentRequestDTO requestDTO){
+    public CompletionStage<Boolean> deduct(@RequestBody final DeductPaymentRequestDTO requestDTO){
         return this.service.deductPayment(requestDTO);
+    }
+
+    @PostMapping("/revert")
+    @Operation(summary = "reverts the balance deduction against an order", description = "This api reverts the balance deduction against an order")
+    public CompletionStage<Boolean> revertPaymentDeduction(@RequestBody final RevertPaymentRequestDTO requestDTO){
+        return this.service.revertPaymentDeduction(requestDTO);
     }
 
     @PostMapping("/add")
     @Operation(summary = "reverts the balance deduction against an order", description = "This api reverts the balance deduction against an order")
-    public CompletionStage<Boolean> add(@RequestBody final PaymentRequestDTO requestDTO){
-        return this.service.addPayment(requestDTO);
+    public CompletionStage<Boolean> add(@RequestBody final AddBalanceRequestDTO requestDTO){
+        return this.service.addBalance(requestDTO);
     }
 
     @GetMapping("/{userId}")

@@ -9,4 +9,5 @@ public interface OrderService {
 
     CompletionStage<OrderResponseDTO> createOrder(CreateOrderRequestDTO createOrderRequestDTO);
     CompletionStage<OrderResponseDTO> getOrder(String orderNo);
+    CompletionStage<OrderResponseDTO> retryOrder(String orderNo);
 }

@@ -29,4 +29,9 @@ public class OrderControllerImpl implements OrderController {
     public CompletionStage<OrderResponseDTO> cancelOrder(String orderNo) {
         return null;
     }
+
+    @Override
+    public CompletionStage<Boolean> retryOrder(String orderNo) {
+        return orderService.retryOrder(orderNo).thenApply(_ignore->true);
+    }
 }

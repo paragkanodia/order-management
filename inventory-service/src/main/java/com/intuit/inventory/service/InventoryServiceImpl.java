@@ -1,6 +1,8 @@
 package com.intuit.inventory.service;
 
-import com.intuit.appUtility.dto.request.InventoryRequestDTO;
+import com.intuit.appUtility.dto.request.AddInventoryRequestDTO;
+import com.intuit.appUtility.dto.request.DeductInventoryRequestDTO;
+import com.intuit.appUtility.dto.request.RevertInventoryDeductionRequestDTO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -13,31 +15,48 @@ import java.util.concurrent.CompletionStage;
 public class InventoryServiceImpl implements InventoryService{
 
     private Map<String, Integer> productInventoryMap;
+    private Map<Long, Integer> orderQuantityMap;
+
     @PostConstruct
     private void init(){
         this.productInventoryMap = new HashMap<>();
-        this.productInventoryMap.put("1", 5);
-        this.productInventoryMap.put("2", 5);
-        this.productInventoryMap.put("3", 5);
+        this.orderQuantityMap=new HashMap<>();
     }
 
     @Override
-    public CompletionStage<Boolean> addInventory(InventoryRequestDTO requestDTO) {
-        int quantity = this.productInventoryMap.getOrDefault(requestDTO.getProductCode(), 0);
-        this.productInventoryMap.put(requestDTO.getProductCode(), quantity + requestDTO.getQuantity());
+    public CompletionStage<Boolean> revertInventoryDeduction(RevertInventoryDeductionRequestDTO requestDTO) {
+        if(orderQuantityMap.containsKey(requestDTO.getOrderId()))
+        {
+            int quantity = this.productInventoryMap.getOrDefault(requestDTO.getProductCode(), 0);
+            this.productInventoryMap.put(requestDTO.getProductCode(), quantity + orderQuantityMap.get(requestDTO.getOrderId()));
+            this.orderQuantityMap.remove(requestDTO.getOrderId());
+        }
         return CompletableFuture.completedFuture(true);
     }
 
     @Override
-    public CompletionStage<Boolean> deductInventory(InventoryRequestDTO requestDTO) {
-        int quantity = this.productInventoryMap.getOrDefault(requestDTO.getProductCode(), 0);
-        if(quantity > requestDTO.getQuantity()){
-            this.productInventoryMap.put(requestDTO.getProductCode(), quantity - requestDTO.getQuantity());
+    public CompletionStage<Boolean> addInventory(AddInventoryRequestDTO inventoryRequestDTO) {
+        int quantity = this.productInventoryMap.getOrDefault(inventoryRequestDTO.getProductCode(), 0);
+        this.productInventoryMap.put(inventoryRequestDTO.getProductCode(), quantity + inventoryRequestDTO.getQuantity());
+        return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
+    public CompletionStage<Boolean> deductInventory(DeductInventoryRequestDTO requestDTO) {
+        if(!orderQuantityMap.containsKey(requestDTO.getOrderId()))
+        {
+            int quantity = this.productInventoryMap.getOrDefault(requestDTO.getProductCode(), 0);
+            if(quantity >=requestDTO.getQuantity()){
+                this.productInventoryMap.put(requestDTO.getProductCode(), quantity - requestDTO.getQuantity());
+                this.orderQuantityMap.put(requestDTO.getOrderId(), requestDTO.getQuantity());
+            }
+            else
+                return CompletableFuture.completedFuture(false);
+
+            return CompletableFuture.completedFuture(true);
         }
         else
             return CompletableFuture.completedFuture(false);
-
-        return CompletableFuture.completedFuture(true);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.intuit.product.repository.ProductRepository;
 import com.intuit.product.repository.entity.Product;
 import com.intuit.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -65,9 +66,12 @@ public class ProductServiceImpl implements ProductService {
 
     private Product findProductByCode(String code){
         Product product=null;
-        product=(Product) productsCacheManager.getCache("productsCache").get(code).get();
+        Cache.ValueWrapper productsCacheResult = productsCacheManager.getCache("productsCache").get(code);
+
+        if(Objects.nonNull(productsCacheResult))
+            product=(Product)  productsCacheResult.get();
         if(Objects.isNull(product))
-         product = productRepository.findByCode(code);
+            product = productRepository.findByCode(code);
 
         ValidationHelper.notNull(product, ExceptionCodes.V101,"Product with code: "+code+" not found");
         return product;

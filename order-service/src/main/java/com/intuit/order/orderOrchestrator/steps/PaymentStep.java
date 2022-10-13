@@ -1,11 +1,11 @@
 package com.intuit.order.orderOrchestrator.steps;
 
+import com.intuit.commons.restClients.paymentService.request.DeductPaymentRequestDTO;
 import com.intuit.commons.restClients.paymentService.request.PaymentRequestDTO;
+import com.intuit.commons.restClients.paymentService.request.RevertPaymentRequestDTO;
 import com.intuit.commons.restClients.paymentService.service.PaymentService;
 import com.intuit.order.orderOrchestrator.WorkflowStep;
 import com.intuit.order.orderOrchestrator.WorkflowStepStatus;
-
-import java.util.concurrent.CompletionStage;
 
 public class PaymentStep implements WorkflowStep {
 
@@ -25,7 +25,11 @@ public class PaymentStep implements WorkflowStep {
 
     @Override
     public Boolean process() {
-        Boolean result = paymentService.deductPayment(requestDTO).toCompletableFuture().join();
+        Boolean result = paymentService.deductPayment(DeductPaymentRequestDTO.builder()
+                        .amount(requestDTO.getAmount())
+                        .orderId(requestDTO.getOrderId())
+                        .userId(requestDTO.getUserId())
+                .build()).toCompletableFuture().join();
         if(result==false)
         {
             this.stepStatus=WorkflowStepStatus.FAILED;
@@ -37,7 +41,10 @@ public class PaymentStep implements WorkflowStep {
 
     @Override
     public Boolean revert() {
-        return paymentService.revertPayment(requestDTO).toCompletableFuture().join();
+        return paymentService.revertPayment(RevertPaymentRequestDTO.builder()
+                        .orderId(requestDTO.getOrderId())
+                        .userId(requestDTO.getUserId())
+                .build()).toCompletableFuture().join();
     }
 
 }

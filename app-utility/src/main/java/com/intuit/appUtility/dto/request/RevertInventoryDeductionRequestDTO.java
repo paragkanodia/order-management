@@ -7,8 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class InventoryRequestDTO {
+public class RevertInventoryDeductionRequestDTO {
     private Long orderId;
     private String productCode;
-    private Integer quantity;
 }

@@ -1,6 +1,8 @@
 package com.intuit.order.orderOrchestrator.steps;
 
+import com.intuit.commons.restClients.inventoryService.request.DeductInventoryRequestDTO;
 import com.intuit.commons.restClients.inventoryService.request.InventoryRequestDTO;
+import com.intuit.commons.restClients.inventoryService.request.RevertInventoryDeductionRequestDTO;
 import com.intuit.commons.restClients.inventoryService.service.InventoryService;
 import com.intuit.order.orderOrchestrator.WorkflowStep;
 import com.intuit.order.orderOrchestrator.WorkflowStepStatus;
@@ -23,7 +25,11 @@ public class InventoryStep implements WorkflowStep {
 
     @Override
     public Boolean process() {
-        Boolean result = inventoryService.addInventory(requestDTO).toCompletableFuture().join();
+        Boolean result = inventoryService.deductInventory(DeductInventoryRequestDTO.builder()
+                        .orderId(requestDTO.getOrderId())
+                        .productCode(requestDTO.getProductCode())
+                        .quantity(requestDTO.getQuantity())
+                .build()).toCompletableFuture().join();
         if(result==false)
         {
             this.stepStatus=WorkflowStepStatus.FAILED;
@@ -35,6 +41,9 @@ public class InventoryStep implements WorkflowStep {
 
     @Override
     public Boolean revert() {
-        return inventoryService.deductInventory(requestDTO).toCompletableFuture().join();
+        return inventoryService.revertInventoryDeduction(RevertInventoryDeductionRequestDTO.builder()
+                        .orderId(requestDTO.getOrderId())
+                        .productCode(requestDTO.getProductCode())
+                .build()).toCompletableFuture().join();
     }
 }

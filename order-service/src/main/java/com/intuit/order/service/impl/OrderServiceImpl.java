@@ -53,6 +53,16 @@ public class OrderServiceImpl implements OrderService {
                 .thenApply(order -> orderMapper.toOrderResponseDTOFromOrder(order.get()));
     }
 
+    @Override
+    public CompletionStage<OrderResponseDTO> retryOrder(String orderNo) {
+        return CompletableFuture.supplyAsync(()->orderRepository.findById(Long.valueOf(orderNo)))
+                .thenApply(order -> {
+                    if(order.isPresent() && (order.get().getStatus().equals("CREATED") || order.get().getStatus().equals("FAILED")))
+                        sendOrderCreatedEvent(order.get());
+                    return orderMapper.toOrderResponseDTOFromOrder(order.get());
+                });
+    }
+
     private void sendOrderCreatedEvent(Order order){
         OrderCreatedEvent orderCreatedEvent=OrderCreatedEvent.builder()
                 .userId(order.getUserId())
