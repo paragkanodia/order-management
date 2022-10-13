@@ -3,7 +3,9 @@ package com.intuit.order.service.impl;
 import com.intuit.appUtility.dto.request.CreateOrderRequestDTO;
 import com.intuit.appUtility.dto.response.OrderResponseDTO;
 import com.intuit.appUtility.enums.OrderStatus;
+import com.intuit.commons.exception.ExceptionCodes;
 import com.intuit.commons.restClients.productService.service.ProductService;
+import com.intuit.commons.utils.ValidationHelper;
 import com.intuit.order.mappers.OrderMapper;
 import com.intuit.order.model.OrderConfirmedEvent;
 import com.intuit.order.model.OrderCreatedEvent;
@@ -17,6 +19,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -50,16 +53,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CompletionStage<OrderResponseDTO> getOrder(String orderNo) {
         return CompletableFuture.supplyAsync(()->orderRepository.findById(Long.valueOf(orderNo)))
-                .thenApply(order -> orderMapper.toOrderResponseDTOFromOrder(order.get()));
+                .thenApply(order -> {
+                    ValidationHelper.isTrue(order.isPresent(), ExceptionCodes.V101,"Invalid Order No: "+orderNo);
+                    return orderMapper.toOrderResponseDTOFromOrder(order.get());
+                });
     }
 
     @Override
-    public CompletionStage<OrderResponseDTO> retryOrder(String orderNo) {
+    public CompletionStage<Boolean> retryOrder(String orderNo) {
         return CompletableFuture.supplyAsync(()->orderRepository.findById(Long.valueOf(orderNo)))
                 .thenApply(order -> {
                     if(order.isPresent() && (order.get().getStatus().equals("CREATED") || order.get().getStatus().equals("FAILED")))
+                    {
                         sendOrderCreatedEvent(order.get());
-                    return orderMapper.toOrderResponseDTOFromOrder(order.get());
+                        return true;
+                    }
+                    else
+                        return false;
                 });
     }
 

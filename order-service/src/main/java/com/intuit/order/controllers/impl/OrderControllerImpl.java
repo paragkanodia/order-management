@@ -32,6 +32,6 @@ public class OrderControllerImpl implements OrderController {
 
     @Override
     public CompletionStage<Boolean> retryOrder(String orderNo) {
-        return orderService.retryOrder(orderNo).thenApply(_ignore->true);
+        return orderService.retryOrder(orderNo);
     }
 }
